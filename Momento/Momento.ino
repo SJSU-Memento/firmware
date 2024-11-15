@@ -168,12 +168,30 @@ bool initializeCamera() {
 }
 
 void takeAndProcessPhoto() {
+  unsigned long photoStartTime = millis();
   camera_fb_t *fb = esp_camera_fb_get();
+  
   if (!fb) {
     Serial.println("Camera capture failed");
     return;
   }
 
+  // Start a manual blinking loop to ensure the LED blinks while processing
+  while (millis() - photoStartTime < PHOTO_INTERVAL) {
+    // Check if it's time to toggle the LED
+    if (millis() - lastLEDBlinkTime >= LED_BLINK_INTERVAL) {
+      ledState = !ledState;
+      digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
+      lastLEDBlinkTime = millis();
+    }
+
+    // Break out of the loop after one photo is processed
+    if (millis() - photoStartTime >= PHOTO_INTERVAL / 2) {
+      break;
+    }
+  }
+
+  // Proceed with sending or saving the photo
   if (wifi_connected) {
     // Attempt to send the photo to the server
     if (!sendPhotoToServer(fb->buf, fb->len)) {
@@ -196,7 +214,29 @@ bool sendPhotoToServer(uint8_t *image_data, size_t len) {
 
   String base64Image = base64::encode(image_data, len);
   String jsonPayload = "{\"image\":\"" + base64Image + "\"}";
-  int httpResponseCode = http.POST(jsonPayload);
+
+  // Simulate blinking while sending the photo
+  unsigned long sendStartTime = millis();
+  unsigned long lastBlinkTime = millis();
+  int httpResponseCode = 0;
+
+  // Start sending the photo in a blocking manner, but toggle the LED while waiting
+  while ((millis() - sendStartTime) < WIFI_TIMEOUT) { // Use WIFI_TIMEOUT as a time limit
+    // Check if it's time to toggle the LED
+    if (millis() - lastBlinkTime >= LED_BLINK_INTERVAL) {
+      ledState = !ledState;
+      digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
+      lastBlinkTime = millis();
+    }
+
+    // Attempt to send the POST request
+    httpResponseCode = http.POST(jsonPayload);
+
+    // Break the loop if the request was completed
+    if (httpResponseCode != 0) {
+      break;
+    }
+  }
 
   // Debug information
   Serial.print("HTTP Response code: ");
