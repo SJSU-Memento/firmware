@@ -7,10 +7,7 @@
 #include <esp_camera.h>
 #include <base64.h>
 #include "camera_pins.h"  // Include your camera pin configuration
-
-// WiFi credentials
-#define WIFI_SSID "OJ"
-#define WIFI_PASSWORD "OMAJAM125"
+#include "credentials.h" // Configure your WiFi and Password in credentials.h file
 
 // Define the upload URL
 const char *upload_url = "https://memento.noahcardoza.dev/api/upload/";
@@ -19,9 +16,9 @@ const char *upload_url = "https://memento.noahcardoza.dev/api/upload/";
 #define SD_CS_PIN 21  // Using GPIO 21 as specified in the provided information
 
 // Timing constants
-#define WIFI_TIMEOUT 15000  // 15 seconds
-#define PHOTO_INTERVAL 5000  // 5 seconds
-#define WIFI_RECONNECT_INTERVAL 15000  // 15 seconds
+#define WIFI_TIMEOUT 20000  // 20 seconds
+#define PHOTO_INTERVAL 15000  // 15 seconds
+#define WIFI_RECONNECT_INTERVAL 20000  // 20 seconds
 #define LED_BLINK_INTERVAL 1000  // Blinking interval of 1 second
 
 bool wifi_connected = false;
