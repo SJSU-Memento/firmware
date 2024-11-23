@@ -55,10 +55,10 @@ void setup() {
       return;
     }
 
-    // Create "MomentoCaptures" directory if it doesn't exist
-    if (!SD.exists("/MomentoCaptures")) {
-      SD.mkdir("/MomentoCaptures");
-      Serial.println("Created directory: /MomentoCaptures");
+    // Create "MementoCaptures" directory if it doesn't exist
+    if (!SD.exists("/MementoCaptures")) {
+      SD.mkdir("/MementoCaptures");
+      Serial.println("Created directory: /MementoCaptures");
     }
   }
 
@@ -245,7 +245,7 @@ bool sendPhotoToServer(uint8_t *image_data, size_t len) {
 
 void savePhotoToSD(uint8_t *image_data, size_t len) {
   static int photoNumber = 0;
-  String path = "/MomentoCaptures/photo" + String(photoNumber++) + ".jpg";
+  String path = "/MementoCaptures/photo" + String(photoNumber++) + ".jpg";
   File file = SD.open(path, FILE_WRITE);
   if (!file) {
     Serial.println("Failed to open file for writing");
